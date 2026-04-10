@@ -1,0 +1,472 @@
+{
+  "info": {
+    "_postman_id": "4e986579-f9ba-4cd8-bdd0-9a40ea0c0c5f",
+    "name": "Demo API Testing",
+    "description": "Postman collection for demonstrating automated API testing of the FastAPI demo service.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Reset Seed State for JSON Scenario",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/reset",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin",
+            "reset"
+          ]
+        },
+        "description": "Loads the initial seed dataset before the JSON import scenario."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "",
+              "pm.test(\"Seed reset loads 3 items\", function () {",
+              "    pm.expect(body.items_loaded).to.eql(3);",
+              "    pm.expect(body.source_file).to.eql(\"seed_items.json\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Seed Items",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/items",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "items"
+          ]
+        },
+        "description": "Checks the initial API state after reset."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "",
+              "pm.test(\"Initial catalog contains 3 items\", function () {",
+              "    pm.expect(body.count).to.eql(3);",
+              "    pm.expect(body.items.length).to.eql(3);",
+              "});",
+              "",
+              "pm.test(\"Seed data includes Keyboard\", function () {",
+              "    pm.expect(body.items[0].name).to.eql(\"Keyboard\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Import Items from JSON",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "data/import_items.json",
+              "contentType": "application/json"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/items/import/json?replace_existing=false",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "items",
+            "import",
+            "json"
+          ],
+          "query": [
+            {
+              "key": "replace_existing",
+              "value": "false"
+            }
+          ]
+        },
+        "description": "Imports the JSON test data file."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "",
+              "pm.test(\"JSON import loads 2 new items\", function () {",
+              "    pm.expect(body.source_format).to.eql(\"json\");",
+              "    pm.expect(body.items_loaded).to.eql(2);",
+              "    pm.expect(body.current_total).to.eql(5);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Compare with Expected JSON Result",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/compare/expected_after_json_import.json",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin",
+            "compare",
+            "expected_after_json_import.json"
+          ]
+        },
+        "description": "Compares the current API state with the expected JSON reference file."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "",
+              "pm.test(\"JSON scenario matches the reference file\", function () {",
+              "    pm.expect(body.matches).to.eql(true);",
+              "    pm.expect(body.actual_count).to.eql(5);",
+              "    pm.expect(body.expected_count).to.eql(5);",
+              "    pm.expect(body.differences.length).to.eql(0);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reset Seed State for CSV Scenario",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/reset",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin",
+            "reset"
+          ]
+        },
+        "description": "Loads the initial seed dataset before the CSV import scenario."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "",
+              "pm.test(\"Seed reset loads 3 items\", function () {",
+              "    pm.expect(body.items_loaded).to.eql(3);",
+              "    pm.expect(body.source_file).to.eql(\"seed_items.json\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Import Items from CSV",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "data/import_items.csv",
+              "contentType": "text/csv"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/items/import/csv?replace_existing=false",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "items",
+            "import",
+            "csv"
+          ],
+          "query": [
+            {
+              "key": "replace_existing",
+              "value": "false"
+            }
+          ]
+        },
+        "description": "Imports the CSV test data file."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "",
+              "pm.test(\"CSV import loads 2 new items\", function () {",
+              "    pm.expect(body.source_format).to.eql(\"csv\");",
+              "    pm.expect(body.items_loaded).to.eql(2);",
+              "    pm.expect(body.current_total).to.eql(5);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Compare with Expected CSV Result",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/compare/expected_after_csv_import.json",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin",
+            "compare",
+            "expected_after_csv_import.json"
+          ]
+        },
+        "description": "Compares the current API state with the expected CSV reference file."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "",
+              "pm.test(\"CSV scenario matches the reference file\", function () {",
+              "    pm.expect(body.matches).to.eql(true);",
+              "    pm.expect(body.actual_count).to.eql(5);",
+              "    pm.expect(body.expected_count).to.eql(5);",
+              "    pm.expect(body.differences.length).to.eql(0);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Missing Item Returns 404",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/items/999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "items",
+            "999"
+          ]
+        },
+        "description": "Checks that requesting a non-existent item returns 404."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "",
+              "pm.test(\"Error mentions the missing item id\", function () {",
+              "    pm.expect(body.detail).to.include(\"id=999\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Item with Negative Price Returns 422",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Broken Item\",\n  \"category\": \"invalid\",\n  \"price\": -10,\n  \"quantity\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/items",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "items"
+          ]
+        },
+        "description": "Checks validation for an invalid negative price."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 422\", function () {",
+              "    pm.response.to.have.status(422);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "",
+              "pm.test(\"Validation error points to the price field\", function () {",
+              "    pm.expect(body.detail.length).to.be.above(0);",
+              "    pm.expect(body.detail[0].loc).to.include(\"price\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Import CSV via JSON Endpoint Returns 400",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "data/import_items.csv",
+              "contentType": "text/csv"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/items/import/json?replace_existing=false",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "items",
+            "import",
+            "json"
+          ],
+          "query": [
+            {
+              "key": "replace_existing",
+              "value": "false"
+            }
+          ]
+        },
+        "description": "Checks that the JSON import endpoint rejects a CSV file."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "",
+              "pm.test(\"Error mentions JSON file requirement\", function () {",
+              "    pm.expect(body.detail).to.include(\"JSON\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    }
+  ]
+}

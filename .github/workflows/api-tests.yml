@@ -1,0 +1,80 @@
+name: API Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  newman-tests:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Python dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Newman dependencies
+        shell: pwsh
+        run: npm ci
+
+      - name: Start API service
+        id: start_api
+        shell: pwsh
+        run: |
+          $process = Start-Process python -ArgumentList "-m","uvicorn","app.main:app","--host","127.0.0.1","--port","8000" -PassThru
+          "api_pid=$($process.Id)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Wait for API health check
+        shell: pwsh
+        run: |
+          $isHealthy = $false
+          for ($attempt = 1; $attempt -le 30; $attempt++) {
+            try {
+              $response = Invoke-WebRequest -Uri "http://127.0.0.1:8000/health" -UseBasicParsing
+              if ($response.StatusCode -eq 200) {
+                $isHealthy = $true
+                break
+              }
+            } catch {
+              Start-Sleep -Seconds 2
+            }
+          }
+
+          if (-not $isHealthy) {
+            throw "API service did not become healthy in time."
+          }
+
+      - name: Run Newman collection
+        shell: pwsh
+        run: npm run test:api
+
+      - name: Upload Newman reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-reports
+          path: reports
+
+      - name: Stop API service
+        if: always()
+        shell: pwsh
+        run: |
+          Stop-Process -Id ${{ steps.start_api.outputs.api_pid }} -ErrorAction SilentlyContinue

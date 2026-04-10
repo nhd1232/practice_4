@@ -1,0 +1,16 @@
+[
+  {
+    "id": 4,
+    "name": "USB Hub",
+    "category": "accessories",
+    "price": 19.99,
+    "quantity": 15
+  },
+  {
+    "id": 5,
+    "name": "Headset",
+    "category": "audio",
+    "price": 59.9,
+    "quantity": 8
+  }
+]

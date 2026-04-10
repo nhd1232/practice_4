@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "name": "Keyboard",
+    "category": "peripherals",
+    "price": 49.99,
+    "quantity": 12
+  },
+  {
+    "id": 2,
+    "name": "Mouse",
+    "category": "peripherals",
+    "price": 24.5,
+    "quantity": 30
+  },
+  {
+    "id": 3,
+    "name": "Webcam",
+    "category": "video",
+    "price": 79.0,
+    "quantity": 7
+  },
+  {
+    "id": 4,
+    "name": "USB Hub",
+    "category": "accessories",
+    "price": 19.99,
+    "quantity": 15
+  },
+  {
+    "id": 5,
+    "name": "Headset",
+    "category": "audio",
+    "price": 59.9,
+    "quantity": 8
+  }
+]

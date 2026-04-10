@@ -1,0 +1,7 @@
+.idea/
+.venv/
+node_modules/
+reports/
+!reports/.gitkeep
+__pycache__/
+*.pyc

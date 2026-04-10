@@ -1,0 +1,1 @@
+# Namespace marker for the demo API package.
